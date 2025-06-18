@@ -6,6 +6,12 @@ import { AppService } from './app.service';
 import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+import { ProgramService } from './program/program.service';
+import { ProgramController } from './program/program.controller';
+import { ProgramModule } from './program/program.module';
+import { ProposalService } from './proposal/proposal.service';
+import { ProposalController } from './proposal/proposal.controller';
+import { ProposalModule } from './proposal/proposal.module';
 
 @Module({
   imports: [
@@ -27,8 +33,10 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     UsersModule,
+    ProgramModule,
+    ProposalModule,
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  controllers: [AppController, UsersController, ProgramController, ProposalController],
+  providers: [AppService, UsersService, ProgramService, ProposalService],
 })
 export class AppModule {}

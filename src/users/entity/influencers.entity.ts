@@ -13,7 +13,7 @@ export enum FORM {
 }
 
 @Entity()
-export class InfluencerPartner {
+export class Influencer {
   @PrimaryGeneratedColumn()
   id: number;
 
