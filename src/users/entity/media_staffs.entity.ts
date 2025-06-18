@@ -9,7 +9,7 @@ import {
 import { User } from './users.entity';
 import { Program } from 'src/program/program.entity';
 
-@Entity()
+@Entity('mediaStaffs')
 export class MediaStaff {
   @PrimaryGeneratedColumn('uuid')
   id: string;

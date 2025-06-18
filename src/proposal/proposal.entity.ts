@@ -10,8 +10,8 @@ export enum ProposalStatus {
   REJECTED = 'rejected',
 }
 
-@Entity()
-export class PromotionProposal {
+@Entity('proposals')
+export class Proposal {
   @PrimaryGeneratedColumn()
   id: number;
 

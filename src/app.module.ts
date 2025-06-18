@@ -12,6 +12,7 @@ import { ProgramModule } from './program/program.module';
 import { ProposalService } from './proposal/proposal.service';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalModule } from './proposal/proposal.module';
+import { KeepModule } from './keep/keep.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ProposalModule } from './proposal/proposal.module';
     UsersModule,
     ProgramModule,
     ProposalModule,
+    KeepModule,
   ],
   controllers: [AppController, UsersController, ProgramController, ProposalController],
   providers: [AppService, UsersService, ProgramService, ProposalService],

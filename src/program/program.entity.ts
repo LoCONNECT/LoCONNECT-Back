@@ -1,7 +1,7 @@
 import { MediaStaff } from 'src/users/entity/media_staffs.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('programs')
 export class Program {
   @PrimaryGeneratedColumn()
   id: number;

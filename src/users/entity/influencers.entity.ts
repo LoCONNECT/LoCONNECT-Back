@@ -12,7 +12,7 @@ export enum FORM {
   GROUP = 'group',
 }
 
-@Entity()
+@Entity('influencers')
 export class Influencer {
   @PrimaryGeneratedColumn()
   id: number;
