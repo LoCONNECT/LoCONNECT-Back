@@ -30,4 +30,16 @@ export class StoreOwner {
 
   @Column()
   storePhone: string;
+
+  @Column()
+  category: string;
+
+  @Column({ type: 'text', nullable: true })
+  introduction: string;
+
+  @Column({ nullable: true })
+  logoImage: string;
+
+  @Column({ type: 'int', default: 0 })
+  minPromotionPrice: number;
 }

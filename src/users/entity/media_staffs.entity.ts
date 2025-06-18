@@ -23,7 +23,7 @@ export class MediaStaff {
   programName: string;
 
   @Column()
-  employmentCert: string;
+  proofFile: string;
   // 재직증명서 파일
 
   @Column()
