@@ -3,19 +3,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersService } from './users/users.service';
-import { UsersController } from './users/users.controller';
-import { UsersModule } from './users/users.module';
 import { ProgramService } from './program/program.service';
 import { ProgramController } from './program/program.controller';
 import { ProgramModule } from './program/program.module';
 import { ProposalService } from './proposal/proposal.service';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalModule } from './proposal/proposal.module';
-import { KeepModule } from './keep/keep.module';
-import { AnnouncementController } from './announcement/announcement.controller';
-import { AnnouncementService } from './announcement/announcement.service';
-import { AnnouncementModule } from './announcement/announcement.module';
+import { InquiryModule } from './common/inquiry/inquiry.module';
+import { InquiryController } from './common/inquiry/inquiry.controller';
+import { InquiryService } from './common/inquiry/inquiry.service';
+import { UsersController } from './common/user/users.controller';
+import { UsersService } from './common/user/users.service';
+import { PaymentService } from './common/payment/payment.service';
+import { PaymentModule } from './common/payment/payment.module';
 
 @Module({
   imports: [
@@ -36,13 +36,25 @@ import { AnnouncementModule } from './announcement/announcement.module';
         synchronize: true,
       }),
     }),
-    UsersModule,
     ProgramModule,
     ProposalModule,
-    KeepModule,
-    AnnouncementModule,
+    InquiryModule,
+    PaymentModule,
   ],
-  controllers: [AppController, UsersController, ProgramController, ProposalController, AnnouncementController],
-  providers: [AppService, UsersService, ProgramService, ProposalService, AnnouncementService],
+  controllers: [
+    AppController,
+    UsersController,
+    ProgramController,
+    ProposalController,
+    InquiryController,
+  ],
+  providers: [
+    AppService,
+    UsersService,
+    ProgramService,
+    ProposalService,
+    InquiryService,
+    PaymentService,
+  ],
 })
 export class AppModule {}
