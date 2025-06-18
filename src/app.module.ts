@@ -13,6 +13,9 @@ import { ProposalService } from './proposal/proposal.service';
 import { ProposalController } from './proposal/proposal.controller';
 import { ProposalModule } from './proposal/proposal.module';
 import { KeepModule } from './keep/keep.module';
+import { AnnouncementController } from './announcement/announcement.controller';
+import { AnnouncementService } from './announcement/announcement.service';
+import { AnnouncementModule } from './announcement/announcement.module';
 
 @Module({
   imports: [
@@ -37,8 +40,9 @@ import { KeepModule } from './keep/keep.module';
     ProgramModule,
     ProposalModule,
     KeepModule,
+    AnnouncementModule,
   ],
-  controllers: [AppController, UsersController, ProgramController, ProposalController],
-  providers: [AppService, UsersService, ProgramService, ProposalService],
+  controllers: [AppController, UsersController, ProgramController, ProposalController, AnnouncementController],
+  providers: [AppService, UsersService, ProgramService, ProposalService, AnnouncementService],
 })
 export class AppModule {}
