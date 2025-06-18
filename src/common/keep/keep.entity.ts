@@ -1,4 +1,3 @@
-import { User } from 'src/users/entity/users.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from '../user/entity/users.entity';
 
 export enum TargetType {
   STORE = 'store',

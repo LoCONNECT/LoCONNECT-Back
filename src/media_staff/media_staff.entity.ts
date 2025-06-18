@@ -1,13 +1,11 @@
+import { User } from 'src/common/user/entity/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { User } from './users.entity';
-import { Program } from 'src/program/program.entity';
 
 @Entity('mediaStaffs')
 export class MediaStaff {
@@ -39,7 +37,4 @@ export class MediaStaff {
 
   @Column({ type: 'text' })
   purpose: string;
-
-  @OneToMany(() => Program, (program) => program.mediaStaff)
-  programs: Program[];
 }

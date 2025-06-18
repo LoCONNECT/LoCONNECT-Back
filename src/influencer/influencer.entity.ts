@@ -1,3 +1,4 @@
+import { User } from 'src/common/user/entity/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,7 +6,6 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './users.entity';
 
 export enum FORM {
   PERSONAL = 'personal',

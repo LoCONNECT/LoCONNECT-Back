@@ -1,21 +1,19 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ProgramService } from './program/program.service';
-import { ProgramController } from './program/program.controller';
-import { ProgramModule } from './program/program.module';
-import { ProposalService } from './proposal/proposal.service';
-import { ProposalController } from './proposal/proposal.controller';
-import { ProposalModule } from './proposal/proposal.module';
+import { ProposalModule } from './common/proposal/proposal.module';
 import { InquiryModule } from './common/inquiry/inquiry.module';
-import { InquiryController } from './common/inquiry/inquiry.controller';
-import { InquiryService } from './common/inquiry/inquiry.service';
-import { UsersController } from './common/user/users.controller';
-import { UsersService } from './common/user/users.service';
-import { PaymentService } from './common/payment/payment.service';
 import { PaymentModule } from './common/payment/payment.module';
+import { AdminService } from './admin/admin.service';
+import { AdminController } from './admin/admin.controller';
+import { AdminModule } from './admin/admin.module';
+import { InfluencerService } from './influencer/influencer.service';
+import { InfluencersController } from './influencer/influencer.controller';
+import { InfluencerModule } from './influencer/influencer.module';
+import { MediaStaffService } from './media_staff/media_staff.service';
+import { MediaStaffController } from './media_staff/media_staff.controller';
+import { MediaStaffModule } from './media_staff/media_staff.module';
+import { StoreOwnerModule } from './store_owner/store_owner.module';
 
 @Module({
   imports: [
@@ -36,25 +34,13 @@ import { PaymentModule } from './common/payment/payment.module';
         synchronize: true,
       }),
     }),
-    ProgramModule,
     ProposalModule,
     InquiryModule,
     PaymentModule,
-  ],
-  controllers: [
-    AppController,
-    UsersController,
-    ProgramController,
-    ProposalController,
-    InquiryController,
-  ],
-  providers: [
-    AppService,
-    UsersService,
-    ProgramService,
-    ProposalService,
-    InquiryService,
-    PaymentService,
+    StoreOwnerModule,
+    AdminModule,
+    InfluencerModule,
+    MediaStaffModule,
   ],
 })
 export class AppModule {}

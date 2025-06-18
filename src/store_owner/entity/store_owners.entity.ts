@@ -1,11 +1,13 @@
+import { User } from 'src/common/user/entity/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-import { User } from '././users.entity';
+import { StoreIntro } from './store_intro.entity';
 
 @Entity('storeOwners')
 export class StoreOwner {
@@ -34,12 +36,12 @@ export class StoreOwner {
   @Column()
   category: string;
 
-  @Column({ type: 'text', nullable: true })
-  introduction: string;
-
   @Column({ nullable: true })
   logoImage: string;
 
   @Column({ type: 'int', default: 0 })
   minPromotionPrice: number;
+
+  @OneToMany(() => StoreIntro, (storeIntro) => storeIntro.storeOwner)
+  storeIntros: StoreIntro[];
 }
