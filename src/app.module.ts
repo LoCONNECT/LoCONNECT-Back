@@ -4,16 +4,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProposalModule } from './common/proposal/proposal.module';
 import { InquiryModule } from './common/inquiry/inquiry.module';
 import { PaymentModule } from './common/payment/payment.module';
-import { AdminService } from './admin/admin.service';
 import { AdminController } from './admin/admin.controller';
 import { AdminModule } from './admin/admin.module';
-import { InfluencerService } from './influencer/influencer.service';
 import { InfluencersController } from './influencer/influencer.controller';
 import { InfluencerModule } from './influencer/influencer.module';
-import { MediaStaffService } from './media_staff/media_staff.service';
 import { MediaStaffController } from './media_staff/media_staff.controller';
 import { MediaStaffModule } from './media_staff/media_staff.module';
 import { StoreOwnerModule } from './store_owner/store_owner.module';
+import { MailService } from './common/mail/mail.service';
+import { MailModule } from './common/mail/mail.module';
 
 @Module({
   imports: [
@@ -41,6 +40,8 @@ import { StoreOwnerModule } from './store_owner/store_owner.module';
     AdminModule,
     InfluencerModule,
     MediaStaffModule,
+    MailModule,
   ],
+  providers: [MailService],
 })
 export class AppModule {}

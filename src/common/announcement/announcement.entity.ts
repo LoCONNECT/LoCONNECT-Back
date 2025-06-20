@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+// 알림
 @Entity()
 export class Announcement {
   @PrimaryGeneratedColumn()

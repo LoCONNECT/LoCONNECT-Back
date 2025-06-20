@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/users.entity';
+import { User } from '../users/users.entity';
 
 export enum TargetType {
   STORE = 'store',
