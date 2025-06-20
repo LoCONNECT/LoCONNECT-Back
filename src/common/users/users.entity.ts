@@ -10,6 +10,7 @@ export enum UserRole {
   OWNER = 'owner',
   MEDIA = 'media',
   INFLUENCER = 'influencer',
+  ADMIN = 'admin',
 }
 
 export enum UserAccept {

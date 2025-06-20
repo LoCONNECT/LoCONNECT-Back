@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 // 알림
-@Entity()
+@Entity('announcements')
 export class Announcement {
   @PrimaryGeneratedColumn()
   id: number;
