@@ -1,4 +1,4 @@
-import { User } from 'src/common/user/entity/users.entity';
+import { User } from 'src/common/user/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
