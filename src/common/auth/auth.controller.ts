@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -55,40 +56,43 @@ export class AuthController {
     return this.authService.signUp(type, body, files);
   }
 
-  // @Post('login')
-  // async login(
-  //   @Body() body: { id: string; password: string },
-  //   @Res({ passthrough: true }) res: Response,
-  // ) {
-  //   const result = await this.authService.localLogin(body.id, body.password);
+  @Post('login')
+  async login(
+    @Body() body: { id: string; password: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { id, password } = body;
 
-  //   if ('success' in result && result.success === false) {
-  //     return result;
-  //   }
+    const result = await this.authService.localLogin(id, password);
 
-  //   const { access_token, refresh_token } =
-  //     await this.authService.issueTokens(result);
+    if (!result.success) {
+      return result;
+    }
 
-  //   res.cookie('access_token', access_token, {
-  //     httpOnly: true,
-  //     secure: true,
-  //     sameSite: 'none',
-  //     maxAge: 1000 * 60 * 15,
-  //   });
+    const { access_token, refresh_token } = await this.authService.issueTokens(
+      result.user!,
+    );
 
-  //   res.cookie('refresh_token', refresh_token, {
-  //     httpOnly: true,
-  //     secure: true,
-  //     sameSite: 'none',
-  //     maxAge: 1000 * 60 * 60 * 24 * 14,
-  //   });
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 15, // 15분
+    });
 
-  //   return {
-  //     success: true,
-  //     id: result.id,
-  //     name: result.name,
-  //     phone: result.phone,
-  //     role: result.role,
-  //   };
-  // }
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 60 * 24 * 14, // 14일
+    });
+
+    return {
+      success: true,
+      id: result.user!.id,
+      name: result.user!.name,
+      phone: result.user!.phone,
+      role: result.user!.role,
+    };
+  }
 }

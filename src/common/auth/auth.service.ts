@@ -29,6 +29,7 @@ export class AuthService {
 
     private readonly hashService: HashService,
     private readonly userService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   // 회원가입 중복 검사
@@ -109,72 +110,63 @@ export class AuthService {
   }
 
   // 로그인
-  // async localLogin(
-  //   loginId: string,
-  //   password: string,
-  // ): Promise<
-  //   { id: string; name: string } | { success: false; message: string }
-  // > {
-  //   const user = await this.userService.findUserByLoginId(loginId, {
-  //     withPassword: true,
-  //   });
+  async localLogin(
+    loginId: string,
+    password: string,
+  ): Promise<{ success: boolean; user?: User; message?: string }> {
+    const user = await this.userService.findUserByLoginId(loginId, {
+      withPassword: true,
+    });
 
-  //   if (!user) {
-  //     return {
-  //       success: false,
-  //       message: '유저 정보가 없습니다.',
-  //     };
-  //   }
+    if (!user) {
+      return {
+        success: false,
+        message: '아이디 또는 비밀번호가 일치하지 않습니다.',
+      };
+    }
 
-  //   // 비밀번호 검증
-  //   const match = await bcrypt.compare(password, user.password!);
+    const match = await bcrypt.compare(password, user.password!);
 
-  //   if (!match) {
-  //     return {
-  //       success: false,
-  //       message: '비밀번호가 틀렸습니다.',
-  //     };
-  //   }
+    if (!match) {
+      return {
+        success: false,
+        message: '아이디 또는 비밀번호가 일치하지 않습니다.',
+      };
+    }
 
-  //   // 토큰 발급
-  //   const { access_token, refresh_token } = await this.issueTokens(user);
+    return { success: true, user };
+  }
 
-  //   return {
-  //     loginId: user.loginId,
-  //     name: user.name,
-  //   };
-  // }
+  // access 토큰 및 refresh 토큰
+  async issueTokens(
+    user: User,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const access_token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')!,
+      {
+        expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+      },
+    );
 
-  // // access 토큰 및 refresh 토큰
-  // async issueTokens(
-  //   user: User,
-  // ): Promise<{ access_token: string; refresh_token: string }> {
-  //   const access_token = jwt.sign(
-  //     {
-  //       id: user.id,
-  //       role: user.role,
-  //     },
-  //     this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')!,
-  //     {
-  //       expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
-  //     },
-  //   );
+    const refresh_token = jwt.sign(
+      {},
+      this.configService.get('JWT_REFRESH_TOKEN_SECRET_KEY')!,
+      {
+        expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+        audience: String(user.id),
+      },
+    );
 
-  //   const refresh_token = jwt.sign(
-  //     {},
-  //     this.configService.get('JWT_REFRESH_TOKEN_SECRET_KEY')!,
-  //     {
-  //       expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
-  //       audience: String(user.id),
-  //     },
-  //   );
+    user.refresh_token = refresh_token;
+    await this.userService.save(user);
 
-  //   user.refresh_token = refresh_token;
-  //   await this.userService.save(user);
-
-  //   return {
-  //     access_token,
-  //     refresh_token,
-  //   };
-  // }
+    return {
+      access_token,
+      refresh_token,
+    };
+  }
 }
