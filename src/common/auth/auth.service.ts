@@ -50,6 +50,11 @@ export class AuthService {
   // 회원가입
   async signUp(type: 'biz' | 'media' | 'influ', body: any, files: any) {
     // 공통 회원 정보 생성
+
+    if (!body.password) {
+      throw new Error('비밀번호가 입력되지 않았습니다.');
+    }
+
     const hashedPw = await this.hashService.hashPassword(body.password);
 
     const user = this.userRepo.create({
