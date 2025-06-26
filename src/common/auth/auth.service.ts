@@ -1,4 +1,175 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
+import { User, UserRole } from '../users/users.entity';
+import * as jwt from 'jsonwebtoken';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
+import { MediaStaff } from 'src/media_staff/media_staff.entity';
+import { Influencer } from 'src/influencer/influencer.entity';
+import { HashService } from './hash.service';
 
 @Injectable()
-export class AuthService {}
+export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+
+    @InjectRepository(StoreOwner)
+    private storeOwnerRepo: Repository<StoreOwner>,
+
+    @InjectRepository(MediaStaff)
+    private mediaRepo: Repository<MediaStaff>,
+
+    @InjectRepository(Influencer)
+    private influRepo: Repository<Influencer>,
+
+    private readonly hashService: HashService,
+    private readonly userService: UsersService,
+  ) {}
+
+  // 회원가입 중복 검사
+  async checkDuplicate(
+    type: 'id' | 'phone',
+    body: { id?: string; phone?: string },
+  ): Promise<boolean> {
+    if (type === 'id') {
+      const user = await this.userService.findUserByLoginId(body.id!);
+      return !!user;
+    } else if (type === 'phone') {
+      const user = await this.userService.findUserByPhone(body.phone!);
+      return !!user;
+    } else {
+      throw new Error('지원하지 않는 타입입니다.');
+    }
+  }
+
+  // 회원가입
+  async signUp(type: 'biz' | 'media' | 'influ', body: any, files: any) {
+    // 공통 회원 정보 생성
+    const hashedPw = await this.hashService.hashPassword(body.password);
+
+    const user = this.userRepo.create({
+      role: type as UserRole,
+      name: body.name,
+      loginId: body.id,
+      email: body.email,
+      password: hashedPw,
+      phone: body.phone,
+      agreeRequired: body.agreeRequired === 'true',
+      agreeOptional: body.agreeOptional === 'true',
+    });
+    const savedUser = await this.userRepo.save(user);
+
+    // 타입별 추가 정보 저장
+    if (type === 'biz') {
+      const storeOwner = this.storeOwnerRepo.create({
+        user: savedUser,
+        bizName: body.bizName,
+        bizLicense: files?.bizLicense?.[0]?.path || '',
+        bizCategory: body.bizCategory,
+        bizPostcode: body.bizPostcode,
+        bizAddress: body.bizAddress,
+        bizAddressDetail: body.bizAddressDetail,
+        bizPhone: body.bizPhone,
+      });
+      await this.storeOwnerRepo.save(storeOwner);
+    } else if (type === 'media') {
+      const mediaStaff = this.mediaRepo.create({
+        user: savedUser,
+        companyName: body.companyName,
+        programName: body.programName,
+        proofFile: files?.proofFile?.[0]?.path || '',
+        department: body.department,
+        purpose: body.purpose,
+      });
+      await this.mediaRepo.save(mediaStaff);
+    } else if (type === 'influ') {
+      const influencer = this.influRepo.create({
+        user: savedUser,
+        representativeName: body.representativeName,
+        influLicense: files?.influLicense?.[0]?.path || '',
+        influDepartment: body.influDepartment,
+        influType: body.influType,
+        influPurpose: body.influPurpose,
+        promoUrl: body.promoUrl,
+      });
+      await this.influRepo.save(influencer);
+    }
+
+    return { message: '회원가입이 완료되었습니다.', userId: savedUser.id };
+  }
+
+  // 로그인
+  // async localLogin(
+  //   loginId: string,
+  //   password: string,
+  // ): Promise<
+  //   { id: string; name: string } | { success: false; message: string }
+  // > {
+  //   const user = await this.userService.findUserByLoginId(loginId, {
+  //     withPassword: true,
+  //   });
+
+  //   if (!user) {
+  //     return {
+  //       success: false,
+  //       message: '유저 정보가 없습니다.',
+  //     };
+  //   }
+
+  //   // 비밀번호 검증
+  //   const match = await bcrypt.compare(password, user.password!);
+
+  //   if (!match) {
+  //     return {
+  //       success: false,
+  //       message: '비밀번호가 틀렸습니다.',
+  //     };
+  //   }
+
+  //   // 토큰 발급
+  //   const { access_token, refresh_token } = await this.issueTokens(user);
+
+  //   return {
+  //     loginId: user.loginId,
+  //     name: user.name,
+  //   };
+  // }
+
+  // // access 토큰 및 refresh 토큰
+  // async issueTokens(
+  //   user: User,
+  // ): Promise<{ access_token: string; refresh_token: string }> {
+  //   const access_token = jwt.sign(
+  //     {
+  //       id: user.id,
+  //       role: user.role,
+  //     },
+  //     this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')!,
+  //     {
+  //       expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+  //     },
+  //   );
+
+  //   const refresh_token = jwt.sign(
+  //     {},
+  //     this.configService.get('JWT_REFRESH_TOKEN_SECRET_KEY')!,
+  //     {
+  //       expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+  //       audience: String(user.id),
+  //     },
+  //   );
+
+  //   user.refresh_token = refresh_token;
+  //   await this.userService.save(user);
+
+  //   return {
+  //     access_token,
+  //     refresh_token,
+  //   };
+  // }
+}

@@ -7,9 +7,9 @@ import {
 } from 'typeorm';
 
 export enum UserRole {
-  OWNER = 'owner',
+  BIZ = 'biz',
   MEDIA = 'media',
-  INFLUENCER = 'influencer',
+  INFLUENCER = 'influ',
   ADMIN = 'admin',
 }
 
@@ -30,6 +30,9 @@ export class User {
   name: string;
 
   @Column({ unique: true })
+  loginId: string;
+
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -39,10 +42,16 @@ export class User {
   phone: string;
 
   @Column({ default: false })
-  termsAgreed: boolean;
+  agreeRequired: boolean;
+
+  @Column({ default: false })
+  agreeOptional: boolean;
 
   @Column({ type: 'enum', enum: UserAccept, default: UserAccept.REJECT })
   acceptStatus: UserAccept;
+
+  @Column({ type: 'varchar', nullable: true })
+  refresh_token: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

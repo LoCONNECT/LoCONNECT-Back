@@ -19,28 +19,25 @@ export class StoreOwner {
   user: User;
 
   @Column()
-  storeName: string;
+  bizName: string;
 
   @Column()
-  file: string;
+  bizLicense: string; // 사업자등록증 파일 경로
 
   @Column()
-  businessType: string;
+  bizCategory: string;
 
   @Column()
-  storeAddress: string;
+  bizPostcode: string;
 
   @Column()
-  storePhone: string;
+  bizAddress: string;
 
   @Column()
-  category: string;
+  bizAddressDetail: string;
 
-  @Column({ nullable: true })
-  logoImage: string;
-
-  @Column({ type: 'int', default: 0 })
-  minPromotionPrice: number;
+  @Column()
+  bizPhone: string;
 
   @OneToMany(() => StoreIntro, (storeIntro) => storeIntro.storeOwner)
   storeIntros: StoreIntro[];

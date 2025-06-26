@@ -11,7 +11,6 @@ export enum FORM {
   PERSONAL = 'personal',
   GROUP = 'group',
 }
-
 @Entity('influencers')
 export class Influencer {
   @PrimaryGeneratedColumn()
@@ -25,16 +24,17 @@ export class Influencer {
   representativeName: string;
 
   @Column()
-  businessRegFile: string;
-  // 사업자 등록증
-
-  @Column({ type: 'enum', enum: FORM })
-  form: FORM;
-
-  @Column({ type: 'text' })
-  purpose: string;
+  influLicense: string; // 사업자등록증 파일 경로
 
   @Column()
-  promotionUrl: string;
-  // 본인 홍보 주소
+  influDepartment: string;
+
+  @Column({ type: 'enum', enum: FORM })
+  influType: FORM;
+
+  @Column({ type: 'text' })
+  influPurpose: string;
+
+  @Column()
+  promoUrl: string;
 }

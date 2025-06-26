@@ -23,17 +23,10 @@ export class MediaStaff {
   programName: string;
 
   @Column()
-  proofFile: string;
-  // 재직증명서 파일
+  proofFile: string; // 재직증명서 파일 경로
 
   @Column()
   department: string;
-
-  @Column()
-  companyAddress: string;
-
-  @Column()
-  companyEmail: string;
 
   @Column({ type: 'text' })
   purpose: string;
