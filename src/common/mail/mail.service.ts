@@ -11,7 +11,10 @@ export class MailService {
   constructor() {
     // 1) Redis 클라이언트 초기화
     this.redis = createClient({
-      // url: process.env.REDIS_URL, // 필요하면 환경변수로
+      socket: {
+        host: process.env.REDIS_HOST || '127.0.0.1', // ← 꼭 지정
+        port: Number(process.env.REDIS_PORT) || 6379,
+      },
     });
     this.redis.connect().catch((err) => console.error('Redis 연결 실패', err));
   }
@@ -22,12 +25,15 @@ export class MailService {
       100000 + Math.random() * 900000,
     ).toString(); // 6자리
 
-    const templatePath = path.join(__dirname, 'templates', 'mail.ejs');
+    const templatePath = path.join(
+      __dirname.replace('dist', 'src'),
+      'templates',
+      'mail.ejs',
+    );
     const html = await ejs.renderFile(templatePath, {
       email,
       code: verificationCode,
     });
-
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
