@@ -72,34 +72,38 @@ export class AuthController {
 
     const result = await this.authService.localLogin(id, password);
 
-    if (!result.success) {
-      return result;
+    if (!result.user) {
+      return {
+        success: false,
+        message: result.message || '로그인에 실패했습니다.',
+      };
     }
 
     const { access_token, refresh_token } = await this.authService.issueTokens(
-      result.user!,
+      result.user,
     );
 
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 1000 * 60 * 15, // 15분
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 15,
     });
 
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 24 * 14, // 14일
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 14,
     });
 
     return {
       success: true,
-      id: result.user!.id,
-      name: result.user!.name,
-      phone: result.user!.phone,
-      role: result.user!.role,
+      id: result.user.id,
+      name: result.user.name,
+      phone: result.user.phone,
+      role: result.user.role,
+      extraInfo: result.user.extraInfo, // 추가 정보도 같이 보내고 싶으면 여기에 추가
     };
   }
 }

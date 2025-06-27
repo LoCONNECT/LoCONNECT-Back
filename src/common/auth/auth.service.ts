@@ -12,6 +12,10 @@ import { MediaStaff } from 'src/media_staff/media_staff.entity';
 import { Influencer } from 'src/influencer/influencer.entity';
 import { HashService } from './hash.service';
 
+type UserWithExtra =
+  | (User & { extraInfo: StoreOwner | null })
+  | (User & { extraInfo: MediaStaff | null })
+  | (User & { extraInfo: Influencer | null });
 @Injectable()
 export class AuthService {
   constructor(
@@ -113,14 +117,13 @@ export class AuthService {
   async localLogin(
     loginId: string,
     password: string,
-  ): Promise<{ success: boolean; user?: User; message?: string }> {
+  ): Promise<{ user?: UserWithExtra; message?: string }> {
     const user = await this.userService.findUserByLoginId(loginId, {
       withPassword: true,
     });
 
     if (!user) {
       return {
-        success: false,
         message: '아이디 또는 비밀번호가 일치하지 않습니다.',
       };
     }
@@ -129,19 +132,37 @@ export class AuthService {
 
     if (!match) {
       return {
-        success: false,
         message: '아이디 또는 비밀번호가 일치하지 않습니다.',
       };
     }
 
     if (user.acceptStatus !== 'accept') {
       return {
-        success: false,
         message: '승인 대기 또는 거절된 계정입니다.',
       };
     }
 
-    return { success: true, user };
+    let extraInfo = null;
+    if (user.role === UserRole.BIZ) {
+      extraInfo = await this.storeOwnerRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    } else if (user.role === UserRole.MEDIA) {
+      extraInfo = await this.mediaRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    } else if (user.role === UserRole.INFLUENCER) {
+      extraInfo = await this.influRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    }
+
+    return {
+      user: {
+        ...user,
+        extraInfo,
+      },
+    };
   }
 
   // access 토큰 및 refresh 토큰

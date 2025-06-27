@@ -10,6 +10,11 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  // 관리자용 모든 유저 확인
+  async findAllUser() {
+    return await this.userRepository.find();
+  }
+
   // 로그인용 아이디로 유저 찾기
   async findUserByLoginId(
     loginId: string,

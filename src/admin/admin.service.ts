@@ -19,6 +19,11 @@ export class AdminService {
     private readonly configService: ConfigService,
   ) {}
 
+  // 유저 목록 전체 조회
+  async getAllUsers() {
+    return this.userService.findAllUser();
+  }
+
   // 유저 승인
   async updateUserAcceptStatus(
     userId: number,

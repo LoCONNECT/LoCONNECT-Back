@@ -1,19 +1,30 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from 'src/common/auth/guard/admin.guard';
 import { AdminService } from './admin.service';
 import { UserAccept } from 'src/common/users/users.entity';
-
+import { ApiOperation } from '@nestjs/swagger';
+import { Request } from 'express';
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
+
+  // 모든 유저 조회
+  @Get('users')
+  @ApiOperation({ summary: '모든 유저 조회' })
+  async getUsers(@Req() req: Request) {
+    const users = await this.adminService.getAllUsers();
+    return { users };
+  }
 
   // 유저 권한 승인
   @Patch('users/:id/accept-status')
