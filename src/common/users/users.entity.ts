@@ -16,6 +16,7 @@ export enum UserRole {
 export enum UserAccept {
   ACCEPT = 'accept',
   REJECT = 'reject',
+  PENDING = 'pending',
 }
 
 @Entity('users')
@@ -47,7 +48,7 @@ export class User {
   @Column({ default: false })
   agreeOptional: boolean;
 
-  @Column({ type: 'enum', enum: UserAccept, default: UserAccept.REJECT })
+  @Column({ type: 'enum', enum: UserAccept, default: UserAccept.PENDING })
   acceptStatus: UserAccept;
 
   @Column({ type: 'varchar', nullable: true })

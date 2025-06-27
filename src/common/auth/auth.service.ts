@@ -134,6 +134,13 @@ export class AuthService {
       };
     }
 
+    if (user.acceptStatus !== 'accept') {
+      return {
+        success: false,
+        message: '승인 대기 또는 거절된 계정입니다.',
+      };
+    }
+
     return { success: true, user };
   }
 
@@ -145,6 +152,7 @@ export class AuthService {
       {
         id: user.id,
         role: user.role,
+        acceptStatus: user.acceptStatus,
       },
       this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY')!,
       {

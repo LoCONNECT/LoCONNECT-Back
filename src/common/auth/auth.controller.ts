@@ -26,7 +26,7 @@ export class AuthController {
     @Query('phone') phone?: string,
   ) {
     if (type === 'id' && !id) {
-      throw new BadRequestException('이메일을 입력해주세요.');
+      throw new BadRequestException('아이디를 입력해주세요.');
     }
     if (type === 'phone' && !phone) {
       throw new BadRequestException('전화번호를 입력해주세요.');
@@ -39,23 +39,30 @@ export class AuthController {
     return { isDuplicate };
   }
 
-  // 타입별로 회원가입
-  @Post(':type')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'bizLicense', maxCount: 1 },
-      { name: 'proofFile', maxCount: 1 },
-      { name: 'influLicense', maxCount: 1 },
-    ]),
-  )
-  async signUp(
-    @Param('type') type: 'biz' | 'media' | 'influ',
-    @UploadedFiles() files: any,
-    @Body() body: any,
-  ) {
-    return this.authService.signUp(type, body, files);
+  // 소상공인 회원가입
+  @Post('signup/biz')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'bizLicense', maxCount: 1 }]))
+  async signupBiz(@UploadedFiles() files: any, @Body() body: any) {
+    return this.authService.signUp('biz', body, files);
   }
 
+  // 방송국 회원가입
+  @Post('signup/media')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'proofFile', maxCount: 1 }]))
+  async signupMedia(@UploadedFiles() files: any, @Body() body: any) {
+    return this.authService.signUp('media', body, files);
+  }
+
+  // 인플루언서 회원가입
+  @Post('signup/influ')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'influLicense', maxCount: 1 }]),
+  )
+  async signupInflu(@UploadedFiles() files: any, @Body() body: any) {
+    return this.authService.signUp('influ', body, files);
+  }
+
+  // 로그인
   @Post('login')
   async login(
     @Body() body: { id: string; password: string },
