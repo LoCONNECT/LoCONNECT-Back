@@ -27,7 +27,7 @@ export class AdminController {
   }
 
   // 유저 권한 승인
-  @Patch('users/:id/accept-status')
+  @Patch('users/:id/accept')
   async updateUserAcceptStatus(
     @Param('id', ParseIntPipe) userId: number,
     @Body('status') status: string,
