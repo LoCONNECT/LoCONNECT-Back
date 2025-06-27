@@ -110,7 +110,28 @@ export class AuthService {
       await this.influRepo.save(influencer);
     }
 
-    return { message: '회원가입이 완료되었습니다.', userId: savedUser.id };
+    let extraInfo = null;
+    if (user.role === UserRole.BIZ) {
+      extraInfo = await this.storeOwnerRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    } else if (user.role === UserRole.MEDIA) {
+      extraInfo = await this.mediaRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    } else if (user.role === UserRole.INFLUENCER) {
+      extraInfo = await this.influRepo.findOne({
+        where: { user: { id: user.id } },
+      });
+    }
+
+    return {
+      message: '회원가입이 완료되었습니다.',
+      user: {
+        ...user,
+        extraInfo,
+      },
+    };
   }
 
   // 로그인

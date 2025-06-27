@@ -13,6 +13,7 @@ import {
 import { AuthService } from './auth.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { createStorage } from '../utils/multer-storage';
 
 @Controller('auth')
 export class AuthController {
@@ -41,14 +42,22 @@ export class AuthController {
 
   // 소상공인 회원가입
   @Post('signup/biz')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'bizLicense', maxCount: 1 }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'bizLicense', maxCount: 1 }], {
+      storage: createStorage('bizLicenses'),
+    }),
+  )
   async signupBiz(@UploadedFiles() files: any, @Body() body: any) {
     return this.authService.signUp('biz', body, files);
   }
 
   // 방송국 회원가입
   @Post('signup/media')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'proofFile', maxCount: 1 }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'proofFile', maxCount: 1 }], {
+      storage: createStorage('mediaProofs'),
+    }),
+  )
   async signupMedia(@UploadedFiles() files: any, @Body() body: any) {
     return this.authService.signUp('media', body, files);
   }
@@ -56,7 +65,9 @@ export class AuthController {
   // 인플루언서 회원가입
   @Post('signup/influ')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'influLicense', maxCount: 1 }]),
+    FileFieldsInterceptor([{ name: 'influLicense', maxCount: 1 }], {
+      storage: createStorage('influLicenses'),
+    }),
   )
   async signupInflu(@UploadedFiles() files: any, @Body() body: any) {
     return this.authService.signUp('influ', body, files);
@@ -74,7 +85,6 @@ export class AuthController {
 
     if (!result.user) {
       return {
-        success: false,
         message: result.message || '로그인에 실패했습니다.',
       };
     }
@@ -98,12 +108,11 @@ export class AuthController {
     });
 
     return {
-      success: true,
       id: result.user.id,
       name: result.user.name,
       phone: result.user.phone,
       role: result.user.role,
-      extraInfo: result.user.extraInfo, // 추가 정보도 같이 보내고 싶으면 여기에 추가
+      extraInfo: result.user.extraInfo,
     };
   }
 }
