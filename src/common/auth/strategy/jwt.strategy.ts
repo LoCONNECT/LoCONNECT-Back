@@ -9,7 +9,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const jwtSecret = configService.get<string>('JWT_ACCESS_TOKEN_SECRET_KEY');
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request) => {
+          return request?.cookies?.['access_token'];
+        },
+      ]),
       secretOrKey: jwtSecret,
     });
   }

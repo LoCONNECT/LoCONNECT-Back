@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
 import { MediaStaff } from 'src/media_staff/media_staff.entity';
 import { Influencer } from 'src/influencer/influencer.entity';
-import { HashService } from './hash.service';
+import { HashService } from '../utils/hash.service';
 
 type UserWithExtra =
   | (User & { extraInfo: StoreOwner | null })
@@ -110,27 +110,8 @@ export class AuthService {
       await this.influRepo.save(influencer);
     }
 
-    let extraInfo = null;
-    if (user.role === UserRole.BIZ) {
-      extraInfo = await this.storeOwnerRepo.findOne({
-        where: { user: { id: user.id } },
-      });
-    } else if (user.role === UserRole.MEDIA) {
-      extraInfo = await this.mediaRepo.findOne({
-        where: { user: { id: user.id } },
-      });
-    } else if (user.role === UserRole.INFLUENCER) {
-      extraInfo = await this.influRepo.findOne({
-        where: { user: { id: user.id } },
-      });
-    }
-
     return {
       message: '회원가입이 완료되었습니다.',
-      user: {
-        ...user,
-        extraInfo,
-      },
     };
   }
 
@@ -177,6 +158,9 @@ export class AuthService {
         where: { user: { id: user.id } },
       });
     }
+
+    const hashed = await bcrypt.hash('Admin1234!', 10);
+    console.log(hashed);
 
     return {
       user: {

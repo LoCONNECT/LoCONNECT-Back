@@ -30,7 +30,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column({ name: 'login_id', unique: true })
   loginId: string;
 
   @Column({ unique: true })

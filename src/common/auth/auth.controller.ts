@@ -108,10 +108,7 @@ export class AuthController {
     });
 
     return {
-      id: result.user.id,
-      name: result.user.name,
-      phone: result.user.phone,
-      role: result.user.role,
+      ...result.user,
       extraInfo: result.user.extraInfo,
     };
   }
