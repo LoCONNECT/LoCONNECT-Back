@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { createStorage } from '../utils/multer-storage';
+import { UserRole } from '../users/users.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -110,6 +111,53 @@ export class AuthController {
     return {
       ...result.user,
       extraInfo: result.user.extraInfo,
+    };
+  }
+
+  // 관리자 로그인
+  @Post('adminLogin')
+  async adminLogin(
+    @Body() body: { id: string; password: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { id, password } = body;
+
+    const result = await this.authService.localLogin(id, password);
+
+    if (!result.user) {
+      return {
+        message: result.message || '로그인에 실패했습니다.',
+      };
+    }
+
+    if (result.user.role !== UserRole.ADMIN) {
+      return {
+        message: '관리자 권한이 없습니다.',
+      };
+    }
+
+    const { access_token, refresh_token } = await this.authService.issueTokens(
+      result.user,
+    );
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 14,
+    });
+
+    return {
+      id: result.user.id,
+      name: result.user.name,
+      role: result.user.role,
     };
   }
 }
