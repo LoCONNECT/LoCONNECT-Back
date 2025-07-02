@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Res,
   UploadedFiles,
   UseInterceptors,
@@ -15,6 +16,12 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { createStorage } from '../utils/multer-storage';
 import { UserRole } from '../users/users.entity';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+
+interface RequestWithCookies extends Request {
+  cookies: { [key: string]: string };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -158,6 +165,34 @@ export class AuthController {
       id: result.user.id,
       name: result.user.name,
       role: result.user.role,
+    };
+  }
+
+  @Post('logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    // JWT에서 유저 ID 추출 (선택)
+    const refreshToken = req.cookies['refresh_token'];
+    if (refreshToken) {
+      try {
+        const decoded = jwt.verify(
+          refreshToken,
+          this.authService['configService'].get('JWT_REFRESH_TOKEN_SECRET_KEY'),
+        ) as { aud?: string };
+
+        if (decoded?.aud) {
+          const userId = Number(decoded.aud);
+          await this.authService.logout(userId);
+        }
+      } catch (e) {
+        // 토큰이 유효하지 않을 수 있음 - 무시
+      }
+    }
+
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+
+    return {
+      message: '로그아웃 되었습니다.',
     };
   }
 }

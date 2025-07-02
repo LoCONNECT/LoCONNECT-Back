@@ -203,4 +203,13 @@ export class AuthService {
       refresh_token,
     };
   }
+
+  // 로그아웃
+  async logout(userId: number): Promise<void> {
+    const user = await this.userService.findUserById(userId);
+    if (user) {
+      user.refresh_token = null;
+      await this.userService.save(user);
+    }
+  }
 }
