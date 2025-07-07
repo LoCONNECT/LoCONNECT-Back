@@ -18,6 +18,9 @@ export class StoreOwner {
   @JoinColumn()
   user: User;
 
+  @Column({ nullable: true })
+  price: number;
+
   @Column()
   bizName: string;
 

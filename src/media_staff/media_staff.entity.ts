@@ -30,4 +30,13 @@ export class MediaStaff {
 
   @Column({ type: 'text' })
   purpose: string;
+
+  @Column()
+  price: number;
+
+  @Column()
+  type: string;
+
+  @Column()
+  image: string;
 }
