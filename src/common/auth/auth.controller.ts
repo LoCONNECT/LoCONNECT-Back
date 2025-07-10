@@ -9,6 +9,7 @@ import {
   Req,
   Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -18,6 +19,7 @@ import { createStorage } from '../utils/multer-storage';
 import { UserRole } from '../users/users.entity';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { JwtAuthGuard } from './guard/auth.guard';
 
 interface RequestWithCookies extends Request {
   cookies: { [key: string]: string };
@@ -168,6 +170,7 @@ export class AuthController {
     };
   }
 
+  // 로그아웃
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     // JWT에서 유저 ID 추출 (선택)
@@ -194,5 +197,12 @@ export class AuthController {
     return {
       message: '로그아웃 되었습니다.',
     };
+  }
+
+  // 토큰 확인용 (프론트- zustand)
+  @UseGuards(JwtAuthGuard)
+  @Get('isLoggedIn')
+  isLoggedIn(@Req() req: Request) {
+    return { status: true };
   }
 }
