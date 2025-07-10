@@ -30,6 +30,7 @@ import { StoreOwnerModule } from './store_owner/store_owner.module';
 import { MailModule } from './common/mail/mail.module';
 import { Notification } from './common/notification/notification.entity';
 import { AppService } from './app.service';
+import { SchedulerModule } from './scheduler/scheduler.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -75,6 +76,7 @@ import { AppService } from './app.service';
     InfluencerModule,
     MediaStaffModule,
     MailModule,
+    SchedulerModule,
   ],
   providers: [AppService],
 })
