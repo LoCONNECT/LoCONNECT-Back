@@ -7,6 +7,9 @@ import {
   Patch,
   Req,
   UseGuards,
+  Query,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { AdminGuard } from 'src/common/auth/guard/admin.guard';
 import { AdminService } from './admin.service';
@@ -20,12 +23,24 @@ export class AdminController {
 
   // 모든 유저 조회
   @Get('users')
-  @ApiOperation({ summary: '모든 유저 조회' })
-  async getUsers(@Req() req: Request) {
-    const users = await this.adminService.getAllUsers();
-    return { users };
-  }
+  @ApiOperation({ summary: '유저 목록 조회 (status로 필터링 가능)' })
+  async getUsers(@Query('status') status?: string) {
+    try {
+      const users = await this.adminService.getAllUsers();
 
+      // status가 있으면 필터링해서 반환
+      if (status) {
+        const filtered = users.filter((x) => x.acceptStatus === status);
+        return { users: filtered };
+      }
+
+      // status 없으면 전체 반환
+      return { users };
+    } catch (err) {
+      console.error('유저 조회 에러:', err.message);
+      throw new InternalServerErrorException('유저 조회 실패');
+    }
+  }
   // 유저 권한 승인
   @Patch('users/:id/accept')
   async updateUserAcceptStatus(
