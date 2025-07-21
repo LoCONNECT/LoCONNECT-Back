@@ -12,13 +12,13 @@ import { Influencer } from './influencer/influencer.entity';
 import { MediaStaff } from './media_staff/media_staff.entity';
 import { StoreIntro } from './store_owner/entity/store_intro.entity';
 import { StoreOwner } from './store_owner/entity/store_owners.entity';
+import { Notice } from './common/notice/notice.entity';
 
 // module
 import { UsersModule } from './common/users/users.module';
 import { AnnouncementModule } from './common/announcement/announcement.module';
 import { AuthModule } from './common/auth/auth.module';
 import { KeepModule } from './common/keep/keep.module';
-import { NotificationModule } from './common/notification/notification.module';
 import { SettlementModule } from './common/settlement/settlement.module';
 import { ProposalModule } from './common/proposal/proposal.module';
 import { InquiryModule } from './common/inquiry/inquiry.module';
@@ -28,9 +28,9 @@ import { InfluencerModule } from './influencer/influencer.module';
 import { MediaStaffModule } from './media_staff/media_staff.module';
 import { StoreOwnerModule } from './store_owner/store_owner.module';
 import { MailModule } from './common/mail/mail.module';
-import { Notification } from './common/notification/notification.entity';
 import { AppService } from './app.service';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { NoticeModule } from './common/notice/notice.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -51,13 +51,13 @@ import { SchedulerModule } from './scheduler/scheduler.module';
           Announcement,
           Inquiry,
           Keep,
-          Notification,
           Payment,
           Proposal,
           Influencer,
           MediaStaff,
           StoreIntro,
           StoreOwner,
+          Notice,
         ],
         synchronize: true,
       }),
@@ -66,7 +66,6 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     AnnouncementModule,
     AuthModule,
     KeepModule,
-    NotificationModule,
     SettlementModule,
     ProposalModule,
     InquiryModule,
@@ -77,6 +76,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     MediaStaffModule,
     MailModule,
     SchedulerModule,
+    NoticeModule,
   ],
   providers: [AppService],
 })

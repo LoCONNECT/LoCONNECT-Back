@@ -10,16 +10,24 @@ import {
   Query,
   BadRequestException,
   InternalServerErrorException,
+  Post,
 } from '@nestjs/common';
 import { AdminGuard } from 'src/common/auth/guard/admin.guard';
 import { AdminService } from './admin.service';
 import { UserAccept } from 'src/common/users/users.entity';
 import { ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
+import { NoticeService } from 'src/common/notice/notice.service';
+import { CreateNoticeDto } from 'src/common/notice/dto/create.dto';
+import { Notice } from 'src/common/notice/notice.entity';
+import { UpdateNoticeDto } from 'src/common/notice/dto/update.dto';
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly noticesService: NoticeService,
+  ) {}
 
   // 모든 유저 조회
   @Get('users')
@@ -62,5 +70,18 @@ export class AdminController {
       message: `유저 acceptStatus가 ${status}로 변경되었습니다.`,
       user: updatedUser,
     };
+  }
+
+  @Post('/notices')
+  async create(@Body() dto: CreateNoticeDto): Promise<Notice> {
+    return this.noticesService.create(dto);
+  }
+
+  @Patch('/notices/:id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateNoticeDto,
+  ): Promise<Notice> {
+    return this.noticesService.update(id, dto);
   }
 }
