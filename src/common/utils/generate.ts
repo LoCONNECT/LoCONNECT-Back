@@ -2,7 +2,7 @@ export function randomPass(length = 10): string {
   const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lower = 'abcdefghijklmnopqrstuvwxyz';
   const number = '0123456789';
-  const special = '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+  const special = '!@#$%^&*()_-+=';
   const all = upper + lower + number + special;
 
   const getRandom = (chars: string) =>
