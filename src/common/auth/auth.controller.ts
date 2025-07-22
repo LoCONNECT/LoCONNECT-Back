@@ -229,5 +229,7 @@ export class AuthController {
   @Post('send-password')
   async tempPass(@Body() body: { loginId: string; email: string }) {
     const { loginId, email } = body;
+
+    return await this.authService.sendTempPass(loginId, email);
   }
 }

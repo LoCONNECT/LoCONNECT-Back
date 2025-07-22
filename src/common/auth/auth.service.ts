@@ -237,7 +237,14 @@ export class AuthService {
       return { result: false, message: res.message };
     }
 
-    return { result: res.result, message: res.message, email: email };
+    const user = await this.userService.findUserByEmail(email);
+
+    return {
+      result: res.result,
+      message: res.message,
+      email: email,
+      loginId: user.loginId,
+    };
   }
 
   //임시 비밀번호 발송 및 발송된 비밀번호로 업데이트
