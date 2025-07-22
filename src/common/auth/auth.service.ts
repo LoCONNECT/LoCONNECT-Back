@@ -12,7 +12,7 @@ import { MediaStaff } from 'src/media_staff/media_staff.entity';
 import { Influencer } from 'src/influencer/influencer.entity';
 import { HashService } from '../utils/hash.service';
 import { MailService } from '../mail/mail.service';
-
+import { randomPass } from '../utils/generate';
 type UserWithExtra =
   | (User & { extraInfo: StoreOwner | null })
   | (User & { extraInfo: MediaStaff | null })
@@ -255,7 +255,7 @@ export class AuthService {
       return { result: false, message: '이메일이 올바르지 않습니다.' };
     }
 
-    const tempPassword = Math.random().toString(36).slice(-10);
+    const tempPassword = randomPass();
     const hashed = await this.hashService.hashPassword(tempPassword);
     user.password = hashed;
     await this.userService.save(user);
