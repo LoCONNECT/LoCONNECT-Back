@@ -82,4 +82,44 @@ export class MailService {
     await this.redis.del(key); // 검증 후 코드 삭제
     return { result: true, message: '이메일 인증이 완료되었습니다.' };
   }
+
+  // 임시 비밀번호 이메일 발송
+  async sendTemporaryPasswordEmail(
+    email: string,
+    tempPassword: string,
+  ): Promise<{ result: boolean }> {
+    const templatePath = path.join(
+      __dirname.replace('dist', 'src'),
+      'templates',
+      'password.ejs',
+    );
+
+    const html = await ejs.renderFile(templatePath, {
+      email,
+      password: tempPassword,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: (process.env.SMTP_PASS || '').trim(),
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: '[LoCONNECT] 임시 비밀번호 안내',
+      html,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      return { result: true };
+    } catch (error) {
+      console.error('임시 비밀번호 메일 발송 실패:', error);
+      return { result: false };
+    }
+  }
 }

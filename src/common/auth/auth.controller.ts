@@ -205,4 +205,29 @@ export class AuthController {
   isLoggedIn(@Req() req: Request) {
     return { status: true };
   }
+
+  // 아이디 찾기
+  @Post('send-code')
+  async checkId(@Body() body: { name: string; email: string }) {
+    const { name, email } = body;
+
+    const user = await this.authService.userCheck(name, email);
+    if (!user) {
+      return { result: false, message: '존재하지 않는 사용자입니다.' };
+    }
+
+    return await this.authService.sendMail(email);
+  }
+
+  // 아이디 찾기 인증코드 체크
+  @Post('check-code')
+  async checkCode(@Body() body: { name: string; email: string; code: string }) {
+    const { name, email, code } = body;
+    return await this.authService.checkMailCode(email, code);
+  }
+
+  @Post('send-password')
+  async tempPass(@Body() body: { loginId: string; email: string }) {
+    const { loginId, email } = body;
+  }
 }

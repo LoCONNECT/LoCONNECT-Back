@@ -57,6 +57,25 @@ export class UsersService {
     return this.userRepository.findOne({ where: { id } });
   }
 
+  // 이름으로 유저 찾기
+  findUserByName(name: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { name } });
+  }
+
+  // 이메일로 유저 찾기
+  findUserByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
+  }
+
+  // 이름, 이메일 둘 다 이용해서 찾기
+  async findUserByNameAndEmail(
+    name: string,
+    email: string,
+  ): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { name, email },
+    });
+  }
   // 유저 역할에 맞는 데이터 찾기
   async findDataByRole(userId: number) {
     const user = await this.userRepository.findOne({ where: { id: userId } });

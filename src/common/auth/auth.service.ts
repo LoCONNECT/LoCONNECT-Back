@@ -11,6 +11,7 @@ import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
 import { MediaStaff } from 'src/media_staff/media_staff.entity';
 import { Influencer } from 'src/influencer/influencer.entity';
 import { HashService } from '../utils/hash.service';
+import { MailService } from '../mail/mail.service';
 
 type UserWithExtra =
   | (User & { extraInfo: StoreOwner | null })
@@ -34,6 +35,7 @@ export class AuthService {
     private readonly hashService: HashService,
     private readonly userService: UsersService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   // 회원가입 중복 검사
@@ -211,5 +213,57 @@ export class AuthService {
       user.refresh_token = null;
       await this.userService.save(user);
     }
+  }
+
+  //이름 혹은 이메일로 유저 찾기
+  async userCheck(name: string, email: string): Promise<boolean> {
+    const user = await this.userService.findUserByNameAndEmail(name, email);
+    return !!user;
+  }
+
+  //인증 코드 발송
+  async sendMail(email: string) {
+    return await this.mailService.sendVerificationEmailCode(email);
+  }
+
+  //인증 코드 확인
+  async checkMailCode(
+    email: string,
+    inputCode: string,
+  ): Promise<string | object> {
+    const res = await this.mailService.verifyEmailCode(email, inputCode);
+
+    if (!res.result) {
+      return { result: false, message: res.message };
+    }
+
+    return { result: res.result, message: res.message, email: email };
+  }
+
+  //임시 비밀번호 발송 및 발송된 비밀번호로 업데이트
+  async sendTempPass(loginId: string, email: string): Promise<object> {
+    const user = await this.userService.findUserByLoginId(loginId);
+
+    if (user.email !== email) {
+      return { result: false, message: '이메일이 올바르지 않습니다.' };
+    }
+
+    const tempPassword = Math.random().toString(36).slice(-10);
+    const hashed = await this.hashService.hashPassword(tempPassword);
+    user.password = hashed;
+    await this.userService.save(user);
+
+    const res = await this.mailService.sendTemporaryPasswordEmail(
+      email,
+      tempPassword,
+    );
+    if (!res.result) {
+      return { result: false, message: '메일 발송에 실패했습니다.' };
+    }
+
+    return {
+      result: true,
+      message: '임시 비밀번호가 이메일로 발송되었습니다.',
+    };
   }
 }
