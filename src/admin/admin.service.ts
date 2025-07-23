@@ -3,10 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MailService } from 'src/common/mail/mail.service';
 import { User, UserAccept } from 'src/common/users/users.entity';
-import { UsersService } from 'src/common/users/users.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -15,19 +14,45 @@ export class AdminService {
     @InjectRepository(User)
     private userRepo: Repository<User>,
 
-    private readonly userService: UsersService,
-    private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
-  // 유저 목록 전체 조회
-  async getAllUsers() {
-    return this.userService.findAllUser();
+  // 유저 정보
+  async getUsers(status?: string, searchType?: string, searchWord?: string) {
+    const queryBuilder = this.userRepo.createQueryBuilder('user');
+
+    if (status === 'pending') {
+      queryBuilder.where(
+        'user.acceptStatus = :pending OR user.acceptStatus = :reject',
+        {
+          pending: UserAccept.PENDING,
+          reject: UserAccept.REJECT,
+        },
+      );
+    } else if (status === 'approve') {
+      queryBuilder.where('user.acceptStatus = :status', {
+        status: UserAccept.ACCEPT,
+      });
+
+      if (searchType && searchWord) {
+        if (searchType === 'name') {
+          queryBuilder.andWhere('user.name LIKE :search', {
+            search: `%${searchWord}%`,
+          });
+        } else if (searchType === 'role') {
+          queryBuilder.andWhere('user.role = :role', { role: searchWord });
+        }
+      }
+    }
+
+    return await queryBuilder.getMany();
   }
 
   // 유저 승인
-  async updateUserAcceptStatus(
+  async updateUserStatus(
     userId: number,
     status: UserAccept.ACCEPT | UserAccept.REJECT,
+    reason?: string,
   ): Promise<User> {
     const user = await this.userRepo.findOne({ where: { id: userId } });
 
@@ -42,7 +67,13 @@ export class AdminService {
     }
 
     user.acceptStatus = status;
+    await this.userRepo.save(user);
 
-    return await this.userRepo.save(user);
+    if (status === UserAccept.REJECT && reason) {
+      // 이메일 발송 로직
+      await this.mailService.sendRejectReasonEmail(user.email, reason);
+    }
+
+    return user;
   }
 }

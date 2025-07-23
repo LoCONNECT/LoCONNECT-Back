@@ -122,4 +122,44 @@ export class MailService {
       return { result: false };
     }
   }
+
+  // 관리자 회원가입 거절 사유 이메일 전송
+  async sendRejectReasonEmail(
+    email: string,
+    reason: string,
+  ): Promise<{ result: boolean }> {
+    const templatePath = path.join(
+      __dirname.replace('dist', 'src'),
+      'templates',
+      'reject.ejs',
+    );
+
+    const html = await ejs.renderFile(templatePath, {
+      email,
+      reason,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: (process.env.SMTP_PASS || '').trim(),
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: '[LoCONNECT] 회원가입 거절 안내',
+      html,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      return { result: true };
+    } catch (error) {
+      console.error('거절 메일 발송 실패:', error);
+      return { result: false };
+    }
+  }
 }

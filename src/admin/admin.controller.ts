@@ -31,52 +31,57 @@ export class AdminController {
 
   // 모든 유저 조회
   @Get('users')
-  @ApiOperation({ summary: '유저 목록 조회 (status로 필터링 가능)' })
-  async getUsers(@Query('status') status?: string) {
+  @ApiOperation({ summary: '유저 목록 조회 (status + 검색조건)' })
+  async getUsers(
+    @Query('status') status?: string,
+    @Query('searchType') searchType?: string,
+    @Query('searchWord') searchWord?: string,
+  ) {
     try {
-      const users = await this.adminService.getAllUsers();
-
-      // status가 있으면 필터링해서 반환
-      if (status) {
-        const filtered = users.filter((x) => x.acceptStatus === status);
-        return { users: filtered };
-      }
-
-      // status 없으면 전체 반환
+      const users = await this.adminService.getUsers(
+        status,
+        searchType,
+        searchWord,
+      );
       return { users };
     } catch (err) {
       console.error('유저 조회 에러:', err.message);
       throw new InternalServerErrorException('유저 조회 실패');
     }
   }
+
   // 유저 권한 승인
   @Patch('users/:id/accept')
   async updateUserAcceptStatus(
     @Param('id', ParseIntPipe) userId: number,
     @Body('status') status: string,
+    @Body('reason') reason?: string,
   ) {
     if (status !== UserAccept.ACCEPT && status !== UserAccept.REJECT) {
-      throw new Error(
-        '유효하지 않은 상태 값입니다. accept 또는 reject만 가능합니다.',
+      throw new BadRequestException(
+        'status는 accept 또는 reject만 가능합니다.',
       );
     }
 
-    const updatedUser = await this.adminService.updateUserAcceptStatus(
+    const updatedUser = await this.adminService.updateUserStatus(
       userId,
       status as UserAccept.ACCEPT | UserAccept.REJECT,
+      reason,
     );
 
     return {
-      message: `유저 acceptStatus가 ${status}로 변경되었습니다.`,
+      message: `유저가 ${status}로 처리되었습니다.`,
       user: updatedUser,
     };
   }
 
+  // 공지사항 만들기
   @Post('/notices')
   async create(@Body() dto: CreateNoticeDto): Promise<Notice> {
     return this.noticesService.create(dto);
   }
 
+  // 공지사항 수정
   @Patch('/notices/:id')
   async update(
     @Param('id', ParseIntPipe) id: number,
