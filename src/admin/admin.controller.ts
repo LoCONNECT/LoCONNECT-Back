@@ -21,8 +21,9 @@ import { NoticeService } from 'src/common/notice/notice.service';
 import { CreateNoticeDto } from 'src/common/notice/dto/create.dto';
 import { Notice } from 'src/common/notice/notice.entity';
 import { UpdateNoticeDto } from 'src/common/notice/dto/update.dto';
+import { JwtAuthGuard } from 'src/common/auth/guard/auth.guard';
 @Controller('admin')
-@UseGuards(AdminGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
