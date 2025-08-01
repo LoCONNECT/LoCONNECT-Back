@@ -1,4 +1,11 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  UseGuards,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -24,5 +31,13 @@ export class UsersController {
       ...user,
       extraInfo,
     };
+  }
+
+  @Get('role/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 롤에 따른 정보 조회' })
+  async getUseRoleData(@Param('id', ParseIntPipe) id: number): Promise<{}> {
+    return await this.usersService.findDataByRole(id);
   }
 }
