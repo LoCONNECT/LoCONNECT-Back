@@ -19,7 +19,7 @@ export enum UserType {
   INFLUENCER = 'influencer',
   MEDIASTAFF = 'mediaStaff',
 }
-
+// 제안
 @Entity('proposals')
 export class Proposal {
   @PrimaryGeneratedColumn()
@@ -42,6 +42,7 @@ export class Proposal {
     default: ProposalStatus.PENDING,
   })
   status: ProposalStatus;
+  // 매칭 상태
 
   @CreateDateColumn()
   createdAt: Date;

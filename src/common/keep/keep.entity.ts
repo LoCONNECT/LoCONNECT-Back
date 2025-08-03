@@ -2,27 +2,26 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/users.entity';
-
-export enum TargetType {
-  STORE = 'store',
-  PROGRAM = 'program',
-  INFLUENCER = 'influencer',
-}
 
 @Entity('keeps')
 export class Keep {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  // 찜한 사람 (로그인한 유저)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'enum', enum: TargetType })
-  targetType: TargetType;
+  // 찜 당한 사람
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'target_id' })
+  target: User;
 
   @Column()
   targetId: number;
