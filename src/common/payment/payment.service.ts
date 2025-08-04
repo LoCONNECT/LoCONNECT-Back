@@ -11,11 +11,10 @@ export class PaymentService {
   ) {}
 
   // mypage용 결제 내역 확인
-  async getPaymentByUser(userId: number): Promise<{ payments: Payment[] }> {
-    const payments = await this.paymentRepository.find({
+  async getPaymentByUser(userId: number): Promise<Payment[]> {
+    return this.paymentRepository.find({
       where: { user: { id: userId } },
       order: { paidAt: 'DESC' },
     });
-    return { payments };
   }
 }
