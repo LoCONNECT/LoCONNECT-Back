@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 
 import { MediaStaff } from 'src/media_staff/entity/media_staff.entity';
 import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
 import { Influencer } from 'src/influencer/entity/influencer.entity';
+import { IntroApply } from './intro.entity';
 
 export enum UserRole {
   BIZ = 'biz',
@@ -83,4 +85,9 @@ export class User {
     onDelete: 'CASCADE',
   })
   storeOwner?: StoreOwner;
+
+  @OneToMany(() => IntroApply, (apply) => apply.user, {
+    cascade: true,
+  })
+  introApplies: IntroApply[];
 }

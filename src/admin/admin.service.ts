@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MailService } from 'src/common/mail/mail.service';
-import { User, UserAccept } from 'src/common/users/users.entity';
+import { User, UserAccept } from 'src/common/users/entity/users.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

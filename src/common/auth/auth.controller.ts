@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { createStorage } from '../utils/multer-storage';
-import { UserRole } from '../users/users.entity';
+import { UserRole } from '../users/entity/users.entity';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { JwtAuthGuard } from './guard/auth.guard';

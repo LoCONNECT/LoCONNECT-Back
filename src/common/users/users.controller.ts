@@ -9,7 +9,7 @@ import {
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { Request } from 'express';
-import { UserRole } from './users.entity';
+import { UserRole } from './entity/users.entity';
 import { UserProfileResponseDto } from './dto/profile.dto';
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 

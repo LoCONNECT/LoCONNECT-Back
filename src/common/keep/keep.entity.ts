@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../users/users.entity';
+import { User } from '../users/entity/users.entity';
 
 @Entity('keeps')
 export class Keep {

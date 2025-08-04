@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Keep } from './common/keep/keep.entity';
 import { Inquiry } from './common/inquiry/inquiry.entity';
 import { Announcement } from './common/announcement/announcement.entity';
-import { User } from './common/users/users.entity';
+import { User } from './common/users/entity/users.entity';
 import { Payment } from './common/payment/payment.entity';
 import { Proposal } from './common/proposal/proposal.entity';
 import { InfluencerIntro } from './influencer/entity/influencer.intro.entity';
@@ -33,6 +33,7 @@ import { MailModule } from './common/mail/mail.module';
 import { AppService } from './app.service';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { NoticeModule } from './common/notice/notice.module';
+import { IntroApply } from './common/users/entity/intro.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -62,6 +63,7 @@ import { NoticeModule } from './common/notice/notice.module';
           Notice,
           InfluencerIntro,
           MediaIntro,
+          IntroApply,
         ],
         synchronize: true,
       }),

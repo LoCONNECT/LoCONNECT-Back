@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AdminGuard } from 'src/common/auth/guard/admin.guard';
 import { AdminService } from './admin.service';
-import { UserAccept } from 'src/common/users/users.entity';
+import { UserAccept } from 'src/common/users/entity/users.entity';
 import { ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { NoticeService } from 'src/common/notice/notice.service';

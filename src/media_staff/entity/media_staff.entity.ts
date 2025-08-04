@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/common/users/users.entity';
+import { User } from 'src/common/users/entity/users.entity';
 import { MediaIntro } from './media_intro.entity';
 
 @Entity('mediaStaffs')

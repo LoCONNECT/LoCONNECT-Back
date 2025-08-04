@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../common/users/users.entity';
+import { User } from '../common/users/entity/users.entity';
 import { Influencer } from '../influencer/entity/influencer.entity';
 import { InfluencerIntro } from 'src/influencer/entity/influencer.intro.entity';
 import { MediaStaff } from '../media_staff/entity/media_staff.entity';
 import { MediaIntro } from 'src/media_staff/entity/media_intro.entity';
 import { StoreOwner } from '../store_owner/entity/store_owners.entity';
 import { StoreIntro } from 'src/store_owner/entity/store_intro.entity';
+import { IntroApply } from 'src/common/users/entity/intro.entity';
 
+import { IntroType } from 'src/common/users/entity/intro.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -33,6 +35,9 @@ export class MainService {
 
     @InjectRepository(InfluencerIntro)
     private influencerIntroRepo: Repository<InfluencerIntro>,
+
+    @InjectRepository(IntroApply)
+    private introApplyRepo: Repository<IntroApply>,
   ) {}
 
   async getMainData(type: string) {
@@ -118,10 +123,11 @@ export class MainService {
   //신청 여부 확인하는 함수
   async getAppliedCheck(
     type: string,
-    id: number,
+    introId: number,
+    userId: number,
   ): Promise<{ result: boolean; message: string }> {
     const user = await this.userRepo.findOne({
-      where: { id },
+      where: { id: userId },
       relations: ['storeOwner', 'mediaStaff', 'influencer'],
     });
 
@@ -131,7 +137,10 @@ export class MainService {
 
     if (type === 'restaurant' && user.storeOwner) {
       const intros = await this.storeIntroRepo.find({
-        where: { storeOwner: { id: user.storeOwner.id } },
+        where: {
+          id: introId,
+          storeOwner: { id: user.storeOwner.id },
+        },
       });
 
       result = intros.length > 0;
@@ -139,7 +148,10 @@ export class MainService {
 
     if (type === 'media' && user.mediaStaff) {
       const intros = await this.mediaIntroRepo.find({
-        where: { mediaStaff: { id: user.mediaStaff.id } },
+        where: {
+          id: introId,
+          mediaStaff: { id: user.mediaStaff.id },
+        },
       });
 
       result = intros.length > 0;
@@ -147,12 +159,37 @@ export class MainService {
 
     if (type === 'influ' && user.influencer) {
       const intros = await this.influencerIntroRepo.find({
-        where: { influencer: { id: user.influencer.id } },
+        where: {
+          id: introId,
+          influencer: { id: user.influencer.id },
+        },
       });
 
       result = intros.length > 0;
     }
 
-    return { result, message: '소개글 작성 여부 확인 완료' };
+    return { result, message: '신청 여부 확인 완료' };
+  }
+
+  async applyToIntro(type: string, introId: number, userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new Error('유저를 찾을 수 없습니다.');
+
+    // 중복 신청 방지
+    const alreadyApplied = await this.introApplyRepo.findOne({
+      where: { user: { id: userId }, introType: type as IntroType, introId },
+    });
+
+    if (alreadyApplied) throw new Error('이미 신청한 소개글입니다.');
+
+    const apply = this.introApplyRepo.create({
+      user,
+      introType: type as 'restaurant' | 'media' | 'influ',
+      introId,
+    });
+
+    await this.introApplyRepo.save(apply);
+
+    return { success: true, message: '신청 완료' };
   }
 }
