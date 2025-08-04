@@ -15,6 +15,8 @@ import { MediaIntro } from './media_staff/entity/media_intro.entity';
 import { StoreIntro } from './store_owner/entity/store_intro.entity';
 import { StoreOwner } from './store_owner/entity/store_owners.entity';
 import { Notice } from './common/notice/notice.entity';
+import { IntroApply } from './common/users/entity/intro.entity';
+import { Settlement } from './common/settlement/settlement.entity';
 
 // module
 import { UsersModule } from './common/users/users.module';
@@ -30,10 +32,12 @@ import { InfluencerModule } from './influencer/influencer.module';
 import { MediaStaffModule } from './media_staff/media_staff.module';
 import { StoreOwnerModule } from './store_owner/store_owner.module';
 import { MailModule } from './common/mail/mail.module';
-import { AppService } from './app.service';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { NoticeModule } from './common/notice/notice.module';
-import { IntroApply } from './common/users/entity/intro.entity';
+
+// service
+import { AppService } from './app.service';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -64,6 +68,7 @@ import { IntroApply } from './common/users/entity/intro.entity';
           InfluencerIntro,
           MediaIntro,
           IntroApply,
+          Settlement,
         ],
         synchronize: true,
       }),
