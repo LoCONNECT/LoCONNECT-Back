@@ -5,18 +5,21 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
+import { InfluencerIntro } from './influencer.intro.entity';
 
 export enum FORM {
   PERSONAL = 'personal',
   GROUP = 'group',
 }
+
 @Entity('influencers')
 export class Influencer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 
@@ -24,7 +27,7 @@ export class Influencer {
   representativeName: string;
 
   @Column()
-  influLicense: string; // 사업자등록증 파일 경로
+  influLicense: string;
 
   @Column()
   influDepartment: string;
@@ -37,4 +40,7 @@ export class Influencer {
 
   @Column()
   promoUrl: string;
+
+  @OneToMany(() => InfluencerIntro, (intro) => intro.influencer)
+  intros: InfluencerIntro[];
 }

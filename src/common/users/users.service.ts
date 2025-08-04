@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './users.entity';
 import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
-import { MediaStaff } from 'src/media_staff/media_staff.entity';
-import { Influencer } from 'src/influencer/influencer.entity';
+import { MediaStaff } from 'src/media_staff/entity/media_staff.entity';
+import { Influencer } from 'src/influencer/entity/influencer.entity';
 import { UserAccept } from './users.entity';
 @Injectable()
 export class UsersService {

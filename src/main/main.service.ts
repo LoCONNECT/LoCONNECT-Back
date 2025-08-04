@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../common/users/users.entity';
-import { Influencer } from '../influencer/influencer.entity';
-import { MediaStaff } from '../media_staff/media_staff.entity';
+import { Influencer } from '../influencer/entity/influencer.entity';
+import { InfluencerIntro } from 'src/influencer/entity/influencer.intro.entity';
+import { MediaStaff } from '../media_staff/entity/media_staff.entity';
+import { MediaIntro } from 'src/media_staff/entity/media_intro.entity';
 import { StoreOwner } from '../store_owner/entity/store_owners.entity';
+import { StoreIntro } from 'src/store_owner/entity/store_intro.entity';
+
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -20,6 +24,15 @@ export class MainService {
 
     @InjectRepository(Influencer)
     private influRepo: Repository<Influencer>,
+
+    @InjectRepository(StoreIntro)
+    private storeIntroRepo: Repository<StoreIntro>,
+
+    @InjectRepository(MediaIntro)
+    private mediaIntroRepo: Repository<MediaIntro>,
+
+    @InjectRepository(InfluencerIntro)
+    private influencerIntroRepo: Repository<InfluencerIntro>,
   ) {}
 
   async getMainData(type: string) {
@@ -100,5 +113,46 @@ export class MainService {
     }
 
     return { message: '유효하지 않은 타입입니다.' };
+  }
+
+  //신청 여부 확인하는 함수
+  async getAppliedCheck(
+    type: string,
+    id: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: ['storeOwner', 'mediaStaff', 'influencer'],
+    });
+
+    if (!user) return { result: false, message: '유저를 찾을 수 없습니다.' };
+
+    let result = false;
+
+    if (type === 'restaurant' && user.storeOwner) {
+      const intros = await this.storeIntroRepo.find({
+        where: { storeOwner: { id: user.storeOwner.id } },
+      });
+
+      result = intros.length > 0;
+    }
+
+    if (type === 'media' && user.mediaStaff) {
+      const intros = await this.mediaIntroRepo.find({
+        where: { mediaStaff: { id: user.mediaStaff.id } },
+      });
+
+      result = intros.length > 0;
+    }
+
+    if (type === 'influ' && user.influencer) {
+      const intros = await this.influencerIntroRepo.find({
+        where: { influencer: { id: user.influencer.id } },
+      });
+
+      result = intros.length > 0;
+    }
+
+    return { result, message: '소개글 작성 여부 확인 완료' };
   }
 }

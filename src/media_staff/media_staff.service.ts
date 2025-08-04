@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MediaStaff } from './media_staff.entity';
+import { MediaStaff } from './entity/media_staff.entity';
 @Injectable()
 export class MediaStaffService {
-     constructor(
-        @InjectRepository(MediaStaff)
-        private mediaStaffRepo: Repository<MediaStaff>,
-      ) {}
+  constructor(
+    @InjectRepository(MediaStaff)
+    private mediaStaffRepo: Repository<MediaStaff>,
+  ) {}
 
-      async getMedia(id:number):Promise<{}>{
-        return {}
-      }
+  async getMedia(id: number): Promise<{}> {
+    return {};
+  }
 }

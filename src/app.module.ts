@@ -8,8 +8,10 @@ import { Announcement } from './common/announcement/announcement.entity';
 import { User } from './common/users/users.entity';
 import { Payment } from './common/payment/payment.entity';
 import { Proposal } from './common/proposal/proposal.entity';
-import { Influencer } from './influencer/influencer.entity';
-import { MediaStaff } from './media_staff/media_staff.entity';
+import { InfluencerIntro } from './influencer/entity/influencer.intro.entity';
+import { Influencer } from './influencer/entity/influencer.entity';
+import { MediaStaff } from './media_staff/entity/media_staff.entity';
+import { MediaIntro } from './media_staff/entity/media_intro.entity';
 import { StoreIntro } from './store_owner/entity/store_intro.entity';
 import { StoreOwner } from './store_owner/entity/store_owners.entity';
 import { Notice } from './common/notice/notice.entity';
@@ -58,6 +60,8 @@ import { NoticeModule } from './common/notice/notice.module';
           StoreIntro,
           StoreOwner,
           Notice,
+          InfluencerIntro,
+          MediaIntro,
         ],
         synchronize: true,
       }),

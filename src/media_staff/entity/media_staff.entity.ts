@@ -1,18 +1,20 @@
-import { User } from 'src/common/users/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
+import { User } from 'src/common/users/users.entity';
+import { MediaIntro } from './media_intro.entity';
 
 @Entity('mediaStaffs')
 export class MediaStaff {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 
@@ -23,7 +25,7 @@ export class MediaStaff {
   programName: string;
 
   @Column()
-  proofFile: string; // 재직증명서 파일 경로
+  proofFile: string;
 
   @Column()
   department: string;
@@ -39,4 +41,7 @@ export class MediaStaff {
 
   @Column()
   image: string;
+
+  @OneToMany(() => MediaIntro, (intro) => intro.mediaStaff)
+  intros: MediaIntro[];
 }

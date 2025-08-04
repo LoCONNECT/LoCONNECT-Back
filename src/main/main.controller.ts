@@ -9,4 +9,9 @@ export class MainController {
   async getMainData(@Param('type') type: string) {
     return this.mainService.getMainData(type);
   }
+
+  @Get('applied/:type/:id')
+  async getApplied(@Param('type') type: string, @Param('id') id: string) {
+    return this.mainService.getAppliedCheck(type, Number(id));
+  }
 }

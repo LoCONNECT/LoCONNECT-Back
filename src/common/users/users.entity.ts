@@ -4,7 +4,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
+
+import { MediaStaff } from 'src/media_staff/entity/media_staff.entity';
+import { StoreOwner } from 'src/store_owner/entity/store_owners.entity';
+import { Influencer } from 'src/influencer/entity/influencer.entity';
 
 export enum UserRole {
   BIZ = 'biz',
@@ -59,4 +64,23 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // User.ts
+  @OneToOne(() => MediaStaff, (media) => media.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  mediaStaff?: MediaStaff;
+
+  @OneToOne(() => Influencer, (influ) => influ.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  influencer?: Influencer;
+
+  @OneToOne(() => StoreOwner, (store) => store.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  storeOwner?: StoreOwner;
 }
