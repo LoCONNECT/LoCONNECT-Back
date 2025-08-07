@@ -44,6 +44,15 @@ export class Proposal {
   status: ProposalStatus;
   // 매칭 상태
 
+  @Column({ nullable: true })
+  title: string;
+
+  @Column({ nullable: true, type: 'text' })
+  content: string;
+
+  @Column({ nullable: true })
+  thumbnail: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

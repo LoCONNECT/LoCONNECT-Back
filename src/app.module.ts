@@ -37,6 +37,7 @@ import { NoticeModule } from './common/notice/notice.module';
 
 // service
 import { AppService } from './app.service';
+import { MyPageModule } from './common/mypage/mypage.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { AppService } from './app.service';
     MailModule,
     SchedulerModule,
     NoticeModule,
+    MyPageModule,
   ],
   providers: [AppService],
 })
