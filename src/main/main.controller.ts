@@ -7,11 +7,13 @@ import {
   Req,
   Post,
   Body,
+  ValidationPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/auth/guard/auth.guard';
 import { MainService } from './main.service';
 import { Request } from 'express';
 
+import { CreateIntroDto } from './dto/intro.dto';
 @Controller('main')
 export class MainController {
   constructor(private readonly mainService: MainService) {}
@@ -41,5 +43,33 @@ export class MainController {
   ) {
     const userId = req.user['id'];
     return this.mainService.applyToIntro(type, introId, userId);
+  }
+
+  // main/intro 소개글 작성 엔드포인트
+  @UseGuards(JwtAuthGuard)
+  @Post('intro')
+  async createIntro(
+    @Req() req: Request,
+    @Body(new ValidationPipe({ whitelist: true, transform: true }))
+    dto: CreateIntroDto,
+  ) {
+    const userId = req.user['id'];
+    const intro = await this.mainService.createMyIntro(userId, dto);
+
+    return {
+      id: intro.id,
+      type:
+        'storeOwner' in intro
+          ? 'restaurant'
+          : 'mediaStaff' in intro
+            ? 'media'
+            : 'influencer' in intro
+              ? 'influ'
+              : 'unknown',
+      introduction: intro.introduction ?? '',
+      images: intro.images ?? [],
+      createdAt: intro.createdAt,
+      updatedAt: intro.updatedAt,
+    };
   }
 }

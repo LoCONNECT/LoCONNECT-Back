@@ -1,6 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../common/users/entity/users.entity';
+import { UserRole } from '../common/users/entity/users.entity';
+
 import { Influencer } from '../influencer/entity/influencer.entity';
 import { InfluencerIntro } from 'src/influencer/entity/influencer.intro.entity';
 import { MediaStaff } from '../media_staff/entity/media_staff.entity';
@@ -10,6 +17,8 @@ import { StoreIntro } from 'src/store_owner/entity/store_intro.entity';
 import { IntroApply } from 'src/common/users/entity/intro.entity';
 
 import { IntroType } from 'src/common/users/entity/intro.entity';
+import { CreateIntroDto } from './dto/intro.dto';
+
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -191,5 +200,61 @@ export class MainService {
     await this.introApplyRepo.save(apply);
 
     return { success: true, message: '신청 완료' };
+  }
+
+  // 소개글 작성 폼 API
+  async createMyIntro(userId: number, dto: CreateIntroDto) {
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['storeOwner', 'mediaStaff', 'influencer'],
+    });
+    if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
+
+    const images = (dto.images ?? []).map((s) => s.trim()).filter(Boolean);
+    const introBase = {
+      introduction: dto.introduction ?? null,
+      images: images.length ? images : null,
+    };
+
+    switch (user.role) {
+      case UserRole.BIZ: {
+        if (!user.storeOwner)
+          throw new NotFoundException('가게 사장 프로필이 없습니다.');
+        // (선택) 한 계정당 1개 제한하려면 아래 주석 해제
+        // const exists = await this.storeIntroRepo.findOne({ where: { storeOwner: { id: user.storeOwner.id } }});
+        // if (exists) throw new ConflictException('이미 등록한 소개글이 있습니다.');
+
+        const created = this.storeIntroRepo.create({
+          storeOwner: user.storeOwner,
+          ...introBase,
+        });
+        return await this.storeIntroRepo.save(created);
+      }
+
+      case UserRole.MEDIA: {
+        if (!user.mediaStaff)
+          throw new NotFoundException('방송국 프로필이 없습니다.');
+        const created = this.mediaIntroRepo.create({
+          mediaStaff: user.mediaStaff,
+          ...introBase,
+        });
+        return await this.mediaIntroRepo.save(created);
+      }
+
+      case UserRole.INFLUENCER: {
+        if (!user.influencer)
+          throw new NotFoundException('인플루언서 프로필이 없습니다.');
+        const created = this.influencerIntroRepo.create({
+          influencer: user.influencer,
+          ...introBase,
+        });
+        return await this.influencerIntroRepo.save(created);
+      }
+
+      default:
+        throw new ForbiddenException(
+          '해당 권한은 소개글을 작성할 수 없습니다.',
+        );
+    }
   }
 }
