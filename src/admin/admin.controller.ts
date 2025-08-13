@@ -22,12 +22,16 @@ import { CreateNoticeDto } from 'src/common/notice/dto/create.dto';
 import { Notice } from 'src/common/notice/notice.entity';
 import { UpdateNoticeDto } from 'src/common/notice/dto/update.dto';
 import { JwtAuthGuard } from 'src/common/auth/guard/auth.guard';
+import { UpdateInquiryStatusDto } from 'src/common/inquiry/dto/update-status.dto';
+import { Inquiry } from 'src/common/inquiry/inquiry.entity';
+import { InquiryService } from 'src/common/inquiry/inquiry.service';
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
-    private readonly noticesService: NoticeService,
+    private readonly noticeService: NoticeService,
+    private readonly inquiryService: InquiryService,
   ) {}
 
   // 모든 유저 조회
@@ -79,7 +83,7 @@ export class AdminController {
   // 공지사항 만들기
   @Post('/notices')
   async create(@Body() dto: CreateNoticeDto): Promise<Notice> {
-    return this.noticesService.create(dto);
+    return this.noticeService.create(dto);
   }
 
   // 공지사항 수정
@@ -88,6 +92,16 @@ export class AdminController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateNoticeDto,
   ): Promise<Notice> {
-    return this.noticesService.update(id, dto);
+    return this.noticeService.update(id, dto);
+  }
+
+  // 문의사항 상태 변경
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateInquiryStatusDto,
+  ): Promise<{ inquiry: Inquiry }> {
+    const inquiry = await this.inquiryService.updateStatus(id, dto.status);
+    return { inquiry };
   }
 }

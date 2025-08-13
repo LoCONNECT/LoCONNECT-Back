@@ -58,14 +58,4 @@ export class InquiryController {
     const inquiry = await this.inquiryService.findMyOne(req.user.id, id);
     return { inquiry };
   }
-
-  // 관리자: 상태 변경
-  //   @Patch(':id/status')
-  //   async updateStatus(
-  //     @Param('id', ParseIntPipe) id: number,
-  //     @Body() dto: UpdateInquiryStatusDto,
-  //   ): Promise<{ inquiry: Inquiry }> {
-  //     const inquiry = await this.inquiryService.updateStatus(id, dto.status);
-  //     return { inquiry };
-  //   }
 }
