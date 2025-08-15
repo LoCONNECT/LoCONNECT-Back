@@ -203,17 +203,83 @@ export class MainService {
   }
 
   // 소개글 작성 폼 API
-  async createMyIntro(userId: number, dto: CreateIntroDto) {
+  async createMyIntro(userId: number, dto: CreateIntroDto, files?: any) {
     const user = await this.userRepo.findOne({
       where: { id: userId },
       relations: ['storeOwner', 'mediaStaff', 'influencer'],
     });
     if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
 
-    const images = (dto.images ?? []).map((s) => s.trim()).filter(Boolean);
+    let finalIntroduction = dto.introduction;
+
+    // AI 생성 로직
+    if (dto.useAI && !dto.introduction) {
+      const { generatePrompt, callGemini } = await import('../common/utils/gemini');
+      
+      try {
+        let userInfo: any;
+        
+        switch (user.role) {
+          case UserRole.BIZ:
+            if (!user.storeOwner) throw new NotFoundException('가게 사장 프로필이 없습니다.');
+            userInfo = {
+              bizName: user.storeOwner.bizName,
+              bizAddress: user.storeOwner.bizAddress,
+              bizCategory: user.storeOwner.bizCategory,
+              price: user.storeOwner.price,
+              representativeMenus: dto.representativeMenus,
+              atmosphere: dto.atmosphere,
+              concept: dto.concept,
+            };
+            break;
+            
+          case UserRole.MEDIA:
+            if (!user.mediaStaff) throw new NotFoundException('방송국 프로필이 없습니다.');
+            userInfo = {
+              programName: user.mediaStaff.programName,
+              companyName: user.mediaStaff.companyName,
+              department: user.mediaStaff.department,
+              purpose: user.mediaStaff.purpose,
+              type: user.mediaStaff.type,
+              targetAudience: dto.targetAudience,
+              broadcastFeatures: dto.broadcastFeatures,
+            };
+            break;
+            
+          case UserRole.INFLUENCER:
+            if (!user.influencer) throw new NotFoundException('인플루언서 프로필이 없습니다.');
+            userInfo = {
+              representativeName: user.influencer.representativeName,
+              influDepartment: user.influencer.influDepartment,
+              influPurpose: user.influencer.influPurpose,
+              influType: user.influencer.influType,
+              subscriberCount: dto.subscriberCount,
+              contentType: dto.contentType,
+            };
+            break;
+        }
+
+        const prompt = generatePrompt(user.role, userInfo, {
+          tone: dto.tone,
+          keywords: dto.keywords,
+        });
+        
+        finalIntroduction = await callGemini(prompt);
+      } catch (error) {
+        console.error('AI 소개글 생성 실패:', error);
+        throw new Error('AI 소개글 생성에 실패했습니다. 직접 작성해주세요.');
+      }
+    }
+
+    // 업로드된 파일 경로 처리
+    let imagePaths: string[] = [];
+    if (files && files.images) {
+      imagePaths = files.images.map((file: Express.Multer.File) => file.path);
+    }
+    
     const introBase = {
-      introduction: dto.introduction ?? null,
-      images: images.length ? images : null,
+      introduction: finalIntroduction ?? null,
+      images: imagePaths.length ? imagePaths : null,
     };
 
     switch (user.role) {

@@ -34,6 +34,7 @@ import { StoreOwnerModule } from './store_owner/store_owner.module';
 import { MailModule } from './common/mail/mail.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { NoticeModule } from './common/notice/notice.module';
+import { MainModule } from './main/main.module';
 
 // service
 import { AppService } from './app.service';
@@ -90,6 +91,7 @@ import { MyPageModule } from './common/mypage/mypage.module';
     SchedulerModule,
     NoticeModule,
     MyPageModule,
+    MainModule,
   ],
   providers: [AppService],
 })

@@ -8,10 +8,14 @@ import {
   Post,
   Body,
   ValidationPipe,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/auth/guard/auth.guard';
 import { MainService } from './main.service';
 import { Request } from 'express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { createStorage } from 'src/common/utils/multer-storage';
 
 import { CreateIntroDto } from './dto/intro.dto';
 @Controller('main')
@@ -48,13 +52,24 @@ export class MainController {
   // main/intro 소개글 작성 엔드포인트
   @UseGuards(JwtAuthGuard)
   @Post('intro')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 3 }], {
+      storage: createStorage('introImages'),
+    }),
+  )
   async createIntro(
     @Req() req: Request,
+    @UploadedFiles() files: any,
     @Body(new ValidationPipe({ whitelist: true, transform: true }))
     dto: CreateIntroDto,
   ) {
+    console.log('=== 소개글 생성 요청 시작 ===');
+    console.log('Files:', files);
+    console.log('Body DTO:', dto);
+    console.log('User:', req.user);
+    
     const userId = req.user['id'];
-    const intro = await this.mainService.createMyIntro(userId, dto);
+    const intro = await this.mainService.createMyIntro(userId, dto, files);
 
     return {
       id: intro.id,
